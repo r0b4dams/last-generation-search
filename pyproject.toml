@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Robert Adams", email = "r0b4dams@gmail.com" }]
 requires-python = ">=3.12"
-dependencies = ["requests>=2.32.3"]
+dependencies = ["beautifulsoup4>=4.13.3", "requests>=2.32.3"]
 
 [project.scripts]
 letzegen = "last_generation_search:main"
@@ -15,6 +15,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = [
-    "ruff>=0.9.5",
-]
+dev = ["ruff>=0.9.5"]
