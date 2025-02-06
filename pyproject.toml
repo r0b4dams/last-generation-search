@@ -1,0 +1,17 @@
+[project]
+name = "last-generation-search"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Robert Adams", email = "r0b4dams@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+last-generation-search = "last_generation_search:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
