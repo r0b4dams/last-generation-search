@@ -3,14 +3,12 @@ name = "last-generation-search"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-authors = [
-    { name = "Robert Adams", email = "r0b4dams@gmail.com" }
-]
+authors = [{ name = "Robert Adams", email = "r0b4dams@gmail.com" }]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["requests>=2.32.3"]
 
 [project.scripts]
-last-generation-search = "last_generation_search:main"
+letzegen = "last_generation_search:main"
 
 [build-system]
 requires = ["hatchling"]
