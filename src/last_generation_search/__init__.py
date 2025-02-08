@@ -1,21 +1,24 @@
 import re
 import json
 import datetime
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
 
 TAZ_BASE_URL = "https://taz.de"
-TAZ_STR_QUERY = '"letzte+generation"'
+TAZ_QUERY_PATH = '!s="letzte+generation"'
+
+test_article_url = "https://taz.de/Haus-der-Offiziere/!6063313/"
 
 
 def search_str():
     link_arr = []
-    current_url = f"{TAZ_BASE_URL}/!s={TAZ_STR_QUERY}"
+    curr_url = urljoin(TAZ_BASE_URL, TAZ_QUERY_PATH)
 
     while True:
-        response = requests.get(current_url)
+        response = requests.get(curr_url)
         soup = BeautifulSoup(response.text, "html.parser", parse_only=SoupStrainer("a"))
 
         href_set = set()
@@ -31,7 +34,7 @@ def search_str():
                 href_set.add(href)
 
         if next_page := soup.find("a", attrs={"class": "pagination-next"}):
-            current_url = next_page["href"]
+            curr_url = next_page["href"]
         else:
             break
 
@@ -55,5 +58,16 @@ def get_TAZ_article_id(url: str) -> str | None:
     return None
 
 
+def parse_page(url):
+    article_id = get_TAZ_article_id(url)
+    response = requests.get(url)
+    strainer = SoupStrainer("article")
+    soup = BeautifulSoup(response.text, "html.parser", parse_only=strainer)
+    text = soup.find("article").get_text()
+    with open(f"{article_id}.txt", "w") as f:
+        f.write(text)
+
+
 def main() -> None:
-    search_str()
+    # search_str()
+    parse_page(test_article_url)
