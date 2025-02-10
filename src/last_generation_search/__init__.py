@@ -59,13 +59,58 @@ def get_TAZ_article_id(url: str) -> str | None:
 
 
 def parse_page(url):
-    article_id = get_TAZ_article_id(url)
+    """
+    topline: .typo-r-topline-detail, .typo-topline
+    headline: .typo-r-head-detail, .typo-head-extra-large
+    subline: .typo-r-subline-detail
+
+    ##### date and time are wrapped in <time /> tags
+    date: .meta-data-container > time [0]
+    time: .meta-data-container > time [1]
+
+    Maybe instead we grab metadata from the <meta/> tags from <head>?
+
+    use this to grab
+    document.querySelector("meta[name='taz:title']")
+
+    <meta property="og:title" content="{topline}:{headline}"
+    <meta property="og:description" content="{description}"
+    <meta property="article:published_time" content="{dt}">
+    <meta property="og:locale" content="de_DE">
+    """
+
     response = requests.get(url)
-    strainer = SoupStrainer("article")
-    soup = BeautifulSoup(response.text, "html.parser", parse_only=strainer)
-    text = soup.find("article").get_text()
-    with open(f"{article_id}.txt", "w") as f:
-        f.write(text)
+    soup = BeautifulSoup(
+        response.text,
+        "html.parser",
+        parse_only=SoupStrainer("meta"),
+        # response.text, "html.parser", parse_only=SoupStrainer(["meta", "article"])
+    )
+    data = {}
+
+    title_meta = soup.select_one("meta[name='taz:title']")
+
+    id = title_meta["data-id"]
+    topline, headline = title_meta["content"].split(":")
+
+    data["id"] = id
+    data["topline"] = format_str(topline)
+    data["headline"] = format_str(headline)
+
+    print(data)
+
+    # article_id = get_TAZ_article_id(url)
+    # strainer = SoupStrainer("article")
+    # text = soup.find("article").get_text()
+    # with open(f"{article_id}.txt", "w") as f:
+    #     f.write(text)
+
+
+def format_str(string: str):
+    """
+    Remove zero-width spaces and trim whitespace
+    """
+    return string.replace("\u200b", "").strip()
 
 
 def main() -> None:
