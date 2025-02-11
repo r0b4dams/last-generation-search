@@ -19,7 +19,7 @@ uv sync
 Run the script:
 
 ```sh
-uv run letzegen
+uv run letztegen
 ```
 
 Note - The script can be invoked directly from the [virtual environment](https://docs.python.org/3/library/venv.html):
@@ -31,3 +31,7 @@ source .venv/bin/activate
 # invoke the script
 letzegen
 ```
+
+## taz
+
+[https://taz.de/](https://taz.de/)
