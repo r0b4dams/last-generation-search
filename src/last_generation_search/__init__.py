@@ -1,10 +1,11 @@
 import re
 import json
+import pprint
 import datetime
 from urllib.parse import urljoin
 
 import requests
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup, ResultSet, SoupStrainer, Tag
 
 
 TAZ_BASE_URL = "https://taz.de"
@@ -18,6 +19,8 @@ def search_str():
     curr_url = urljoin(TAZ_BASE_URL, TAZ_QUERY_PATH)
 
     while True:
+        print(curr_url)
+
         response = requests.get(curr_url)
         soup = BeautifulSoup(response.text, "html.parser", parse_only=SoupStrainer("a"))
 
@@ -47,15 +50,7 @@ def search_str():
     print("complete")
 
 
-def get_TAZ_article_id(url: str) -> str | None:
-    """
-    Given a url, return the article's id
-
-    In TAZ URL paths, an article id is a sequence of digits prefixed by '!'
-    """
-    if result := re.search(r"!(\d+)", url):
-        return result.group(1)
-    return None
+page_strainer = SoupStrainer(["meta", "article"])
 
 
 def parse_page(url):
@@ -70,34 +65,58 @@ def parse_page(url):
 
     Maybe instead we grab metadata from the <meta/> tags from <head>?
 
-    use this to grab
-    document.querySelector("meta[name='taz:title']")
 
     <meta property="og:title" content="{topline}:{headline}"
     <meta property="og:description" content="{description}"
-    <meta property="article:published_time" content="{dt}">
     <meta property="og:locale" content="de_DE">
+
+    # metadata
+    ## article id, topline, and headline
+    `"meta[name='taz:title']"`
+
+    ## datetime
+    `"meta[property='article:published_time']"`
+
     """
 
     response = requests.get(url)
-    soup = BeautifulSoup(
-        response.text,
-        "html.parser",
-        parse_only=SoupStrainer("meta"),
-        # response.text, "html.parser", parse_only=SoupStrainer(["meta", "article"])
-    )
+    soup = BeautifulSoup(response.text, "html.parser", parse_only=page_strainer)
+
+    meta_soup = soup.find_all("meta")
+    text_soup = soup.find("article")
+
     data = {}
 
-    title_meta = soup.select_one("meta[name='taz:title']")
-
+    # id, topline, headline
+    title_meta = soup.select_one('meta[name="taz:title"]')
     id = title_meta["data-id"]
     topline, headline = title_meta["content"].split(":")
-
     data["id"] = id
-    data["topline"] = format_str(topline)
-    data["headline"] = format_str(headline)
+    data["topline"] = topline
+    data["headline"] = headline
 
-    print(data)
+    # description
+    desc_meta = soup.select_one('meta[property="og:description"]')
+    data["description"] = desc_meta["content"]
+
+    # authors
+    authors = [
+        meta["content"] for meta in soup.select('meta[property="article:author"]')
+    ]
+    data["authors"] = authors
+
+    # tags
+    tags = [
+        {"id": meta["data-tag-id"], "name": meta["content"]}
+        for meta in soup.select('meta[property="article:tag"]')
+    ]
+    data["tags"] = tags
+
+    # published time
+    dt_meta = soup.select_one('meta[property="article:published_time"]')
+    data["dt"] = dt_meta["content"]
+
+    pprint.pp(data, indent=2)
 
     # article_id = get_TAZ_article_id(url)
     # strainer = SoupStrainer("article")
@@ -113,6 +132,26 @@ def format_str(string: str):
     return string.replace("\u200b", "").strip()
 
 
+def get_id(taz_title_meta: Tag):
+    return taz_title_meta["data-id"]
+
+
+def get_topline_headline(taz_title_meta: Tag):
+    content: str = taz_title_meta["content"]
+
+    if not content:
+        return None
+
+    try:
+        topline, headline = content.split(":")
+        return topline, headline
+    except ValueError:
+        return None, content
+
+
+def get_description(): ...
+
+
 def main() -> None:
-    # search_str()
-    parse_page(test_article_url)
+    search_str()
+    # parse_page(test_article_url)
