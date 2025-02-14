@@ -2,7 +2,7 @@ import os
 import json
 import datetime
 import urllib.parse
-import pprint
+
 
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
@@ -18,9 +18,26 @@ TAZ_QUERY_PATH = '!s="letzte+generation"'
 TAZ_KEYWORD_SEARCH_URL = urllib.parse.urljoin(TAZ_BASE_URL, TAZ_QUERY_PATH)
 
 
+def uniqify(seq):
+    return list(dict.fromkeys(seq))
+
+
 def main():
-    links = get_keyword_search_links()
-    save_search_results(links)
+    print(TAZ_KEYWORD_SEARCH_URL)
+    links = get_search_links(TAZ_KEYWORD_SEARCH_URL)
+    # save_search_results(links)
+    # r = requests.get(TAZ_KEYWORD_SEARCH_URL)
+    # s = BeautifulSoup(
+    #     r.content,
+    #     "html.parser",
+    #     parse_only=SoupStrainer("a"),
+    # )
+    # hrefs = [tag["href"] for tag in s.find_all("a", attrs={"class": "teaser-link"})]
+    # print("base results:")
+    # print(len(hrefs), hrefs, end="\n")
+    # print("unique results:")
+    # unique_hrefs = uniqify(hrefs)
+    # print(len(unique_hrefs), unique_hrefs)
 
 
 def save_search_results(links: list[str]) -> None:
@@ -39,6 +56,7 @@ def save_search_results(links: list[str]) -> None:
 
         id = page.article["id"]
         dt = page.article["date_published"]
+
         if text := page.article["text"]:
             filename = f"articles/{dt}_{id}.txt"
             with open(filename, "w") as f:
@@ -47,7 +65,7 @@ def save_search_results(links: list[str]) -> None:
             print(f"skipping article {id} - no text")
 
 
-def get_keyword_search_links() -> list[str]:
+def get_search_links() -> list[str]:
     page_no = 1
     link_arr = []
     current_url = TAZ_KEYWORD_SEARCH_URL
@@ -61,6 +79,7 @@ def get_keyword_search_links() -> list[str]:
 
         for a_tag in soup.find_all("a", attrs={"class": "teaser-link"}):
             href = a_tag["href"]
+            # NOTE: this is O(n^2)
             if href in href_set:
                 continue
             else:
