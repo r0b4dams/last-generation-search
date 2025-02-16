@@ -24,14 +24,20 @@ class PageScraper(BeautifulSoup):
 
     def _get_article_id_headline(self) -> tuple[str, str]:
         meta = self.find("meta", attrs={"name": "taz:title"})
+        if not meta:
+            return None
         return meta["data-id"], meta["content"]
 
     def _get_article_description(self) -> str:
         meta = self.find("meta", attrs={"name": "description"})
+        if not meta:
+            return None
         return meta["content"]
 
     def _get_article_dt(self) -> str:
         meta = self.find("meta", attrs={"property": "article:published_time"})
+        if not meta:
+            return None
         return meta["content"]
 
     def _get_article_authors(self) -> str:
@@ -45,10 +51,10 @@ class PageScraper(BeautifulSoup):
         ]
 
     def _get_article_text(self) -> str:
-        article_body = self.find(attrs={"class": "main-article-corpus"})
-        article_tags = article_body.select(".headline, .bodytext")
         page_text = []
-        for tag in article_tags:
-            if text := tag.get_text():
-                page_text.append(text)
+        if article_body := self.find(attrs={"class": "main-article-corpus"}):
+            article_tags = article_body.select(".headline, .bodytext")
+            for tag in article_tags:
+                if text := tag.get_text():
+                    page_text.append(text)
         return "\n\n".join(page_text)
