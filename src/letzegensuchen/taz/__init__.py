@@ -53,7 +53,7 @@ class PageScraper(BeautifulSoup):
     def _get_article_text(self) -> str:
         page_text = []
         if article_body := self.find(attrs={"class": "main-article-corpus"}):
-            article_tags = article_body.select(".headline, .bodytext")
+            article_tags = article_body.select(".headline, p.typo-bodytext")
             for tag in article_tags:
                 if text := tag.get_text():
                     page_text.append(text)
