@@ -16,7 +16,9 @@ TAZ_QUERY_PATH = '!s="letzte+generation"'
 TAZ_KEYWORD_SEARCH_URL = urllib.parse.urljoin(TAZ_BASE_URL, TAZ_QUERY_PATH)
 
 
-TAZ_SEARCH_RESULTS_URL = 'https://taz.de/!s="letzte+generation"&eTagAb=2021-01-16&isWochenende=1/'
+TAZ_SEARCH_RESULTS_URL = (
+    'https://taz.de/!s="letzte+generation"&eTagAb=2021-01-16&isWochenende=1/'
+)
 
 
 def uniqify(seq):
@@ -24,8 +26,34 @@ def uniqify(seq):
 
 
 def main():
-    links = get_search_links(TAZ_SEARCH_RESULTS_URL)
-    print(links)
+    #links = get_search_links(TAZ_SEARCH_RESULTS_URL)
+    links = get_links_from_file("keyword_weekend_2025-02-16_23:00:29.511408.json")
+    for url in links:
+        try: 
+            scrape_one_page(url)
+        except Exception:
+            print(f"error parsing {url}")
+    print("scrape complete")
+
+def get_links_from_file(filepath: str):
+    with open(filepath, "r") as f:
+        links = json.load(f)
+    return links
+
+def scrape_one_page(url: str):
+    os.makedirs("articles", exist_ok=True)
+    response = requests.get(url, headers=HEADERS)
+    page = taz.PageScraper(response.text)
+
+    id = page.article["id"]
+    dt = page.article["date_published"]
+
+    if page.article["text"]:
+        filename = f"articles/{dt}_{id}.txt"
+        with open(filename, "w") as f:
+            f.write(page.to_string())
+    else:
+        print(f"skipping article {id} - no text")
 
 
 def save_search_results(links: list[str]) -> None:

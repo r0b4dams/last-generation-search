@@ -58,3 +58,10 @@ class PageScraper(BeautifulSoup):
                 if text := tag.get_text():
                     page_text.append(text)
         return "\n\n".join(page_text)
+    
+    def to_string(self) -> str:
+        text = []
+        for key in ["id", "headline", "description", "text"]:
+            if value := self.article[key]:
+                text.append(value)
+        return "\n\n".join(text)
