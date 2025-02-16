@@ -16,13 +16,16 @@ TAZ_QUERY_PATH = '!s="letzte+generation"'
 TAZ_KEYWORD_SEARCH_URL = urllib.parse.urljoin(TAZ_BASE_URL, TAZ_QUERY_PATH)
 
 
+TAZ_SEARCH_RESULTS_URL = 'https://taz.de/!s="letzte+generation"&eTagAb=2021-01-16&isWochenende=1/'
+
+
 def uniqify(seq):
     return list(dict.fromkeys(seq))
 
 
 def main():
-    print(TAZ_KEYWORD_SEARCH_URL)
-    print(HEADERS)
+    links = get_search_links(TAZ_SEARCH_RESULTS_URL)
+    print(links)
 
 
 def save_search_results(links: list[str]) -> None:
@@ -51,10 +54,10 @@ def save_search_results(links: list[str]) -> None:
             print(f"skipping article {id} - no text")
 
 
-def get_search_links() -> list[str]:
+def get_search_links(url: str) -> list[str]:
     page_no = 1
     link_arr = []
-    current_url = TAZ_KEYWORD_SEARCH_URL
+    current_url = url
 
     while True:
         print(f"scraping page {page_no}")
@@ -80,7 +83,7 @@ def get_search_links() -> list[str]:
             break
 
     dt = str(datetime.datetime.now()).replace(" ", "_")
-    filename = f"keyword_{dt}.json"
+    filename = f"keyword_weekend_{dt}.json"
     with open(filename, "w") as f:
         json.dump(link_arr, f, indent=2)
 
