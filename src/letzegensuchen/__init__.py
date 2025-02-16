@@ -7,11 +7,9 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
-from letzegensuchen import taz
+from letzegensuchen import taz, user_agent
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246"
-}
+HEADERS = {"User-Agent": user_agent.win10_edge}
 
 TAZ_BASE_URL = "https://taz.de"
 TAZ_QUERY_PATH = '!s="letzte+generation"'
@@ -24,20 +22,7 @@ def uniqify(seq):
 
 def main():
     print(TAZ_KEYWORD_SEARCH_URL)
-    links = get_search_links(TAZ_KEYWORD_SEARCH_URL)
-    # save_search_results(links)
-    # r = requests.get(TAZ_KEYWORD_SEARCH_URL)
-    # s = BeautifulSoup(
-    #     r.content,
-    #     "html.parser",
-    #     parse_only=SoupStrainer("a"),
-    # )
-    # hrefs = [tag["href"] for tag in s.find_all("a", attrs={"class": "teaser-link"})]
-    # print("base results:")
-    # print(len(hrefs), hrefs, end="\n")
-    # print("unique results:")
-    # unique_hrefs = uniqify(hrefs)
-    # print(len(unique_hrefs), unique_hrefs)
+    print(HEADERS)
 
 
 def save_search_results(links: list[str]) -> None:
@@ -48,6 +33,7 @@ def save_search_results(links: list[str]) -> None:
 
         try:
             response = requests.get(link, headers=HEADERS)
+
         except requests.exceptions.TooManyRedirects:
             print("Encountered TooManyRedirects exception")
             print("Error accessing", link)
