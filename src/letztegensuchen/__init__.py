@@ -3,7 +3,6 @@ import json
 import datetime
 import urllib.parse
 
-
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
