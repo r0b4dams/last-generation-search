@@ -21,10 +21,6 @@ TAZ_SEARCH_RESULTS_URL = (
 )
 
 
-def uniqify(seq):
-    return list(dict.fromkeys(seq))
-
-
 def main():
     # links = get_search_links(TAZ_SEARCH_RESULTS_URL)
     links = get_links_from_file("keyword_weekend_2025-02-16_23:00:29.511408.json")
