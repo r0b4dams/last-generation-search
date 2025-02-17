@@ -7,7 +7,7 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
-from letzegensuchen import taz, user_agent
+from letztegensuchen import taz, user_agent
 
 HEADERS = {"User-Agent": user_agent.win10_edge}
 
@@ -26,19 +26,21 @@ def uniqify(seq):
 
 
 def main():
-    #links = get_search_links(TAZ_SEARCH_RESULTS_URL)
+    # links = get_search_links(TAZ_SEARCH_RESULTS_URL)
     links = get_links_from_file("keyword_weekend_2025-02-16_23:00:29.511408.json")
     for url in links:
-        try: 
+        try:
             scrape_one_page(url)
         except Exception:
             print(f"error parsing {url}")
     print("scrape complete")
 
+
 def get_links_from_file(filepath: str):
     with open(filepath, "r") as f:
         links = json.load(f)
     return links
+
 
 def scrape_one_page(url: str):
     os.makedirs("articles", exist_ok=True)
