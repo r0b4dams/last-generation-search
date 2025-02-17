@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
 from letztegensuchen.config import TAZ_BASE_URL
+from letztegensuchen.utils.json import load_json, save_json
 from letztegensuchen import taz, user_agent
 
 HEADERS = {"User-Agent": user_agent.win10_edge}
@@ -23,23 +24,20 @@ TAZ_SEARCH_RESULTS_URL = (
 
 def main():
     # links = get_search_links(TAZ_SEARCH_RESULTS_URL)
-    links = get_links_from_file("keyword_weekend_2025-02-16_23:00:29.511408.json")
-    for url in links:
-        try:
-            scrape_one_page(url)
-        except Exception:
-            print(f"error parsing {url}")
-    print("scrape complete")
 
+    links = load_json("keyword_weekend_2025-02-16_23:00:29.511408.json")
 
-def get_links_from_file(filepath: str):
-    with open(filepath, "r") as f:
-        links = json.load(f)
-    return links
+    # for url in links:
+    #     try:
+    #         scrape_one_page(url)
+    #     except Exception:
+    #         print(f"error parsing {url}")
+    # print("scrape complete")
 
 
 def scrape_one_page(url: str):
     os.makedirs("articles", exist_ok=True)
+
     response = requests.get(url, headers=HEADERS)
     page = taz.PageScraper(response.text)
 
@@ -56,13 +54,14 @@ def scrape_one_page(url: str):
 
 def save_search_results(links: list[str]) -> None:
     os.makedirs("articles", exist_ok=True)
+
     total_links = len(links)
+
     for i, link in enumerate(links):
         print(f"saving page {i + 1} of {total_links} at {link}")
 
         try:
             response = requests.get(link, headers=HEADERS)
-
         except requests.exceptions.TooManyRedirects:
             print("Encountered TooManyRedirects exception")
             print("Error accessing", link)
@@ -110,6 +109,7 @@ def get_search_links(url: str) -> list[str]:
 
     dt = str(datetime.datetime.now()).replace(" ", "_")
     filename = f"keyword_weekend_{dt}.json"
+
     with open(filename, "w") as f:
         json.dump(link_arr, f, indent=2)
 
