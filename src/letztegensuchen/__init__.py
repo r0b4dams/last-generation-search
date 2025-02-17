@@ -7,11 +7,12 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 
+from letztegensuchen.config import TAZ_BASE_URL
 from letztegensuchen import taz, user_agent
 
 HEADERS = {"User-Agent": user_agent.win10_edge}
 
-TAZ_BASE_URL = "https://taz.de"
+
 TAZ_QUERY_PATH = '!s="letzte+generation"'
 TAZ_KEYWORD_SEARCH_URL = urllib.parse.urljoin(TAZ_BASE_URL, TAZ_QUERY_PATH)
 
