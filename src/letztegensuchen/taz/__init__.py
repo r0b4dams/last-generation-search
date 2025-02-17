@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup, SoupStrainer
 
+from letztegensuchen.taz._types import Article
+
 
 class PageScraper(BeautifulSoup):
     def __init__(
@@ -14,12 +16,12 @@ class PageScraper(BeautifulSoup):
             parse_only=parse_only,
             **kwargs,
         )
-        self.article = {}
+        self.article: Article = {}
         self.article["id"], self.article["headline"] = self._get_article_id_headline()
         self.article["description"] = self._get_article_description()
         self.article["date_published"] = self._get_article_dt()
         self.article["authors"] = self._get_article_authors()
-        self.article["tags"] = self._get_article_tags()
+        self.article["topics"] = self._get_article_tags()
         self.article["text"] = self._get_article_text()
 
     def _get_article_id_headline(self) -> tuple[str, str]:
@@ -58,7 +60,7 @@ class PageScraper(BeautifulSoup):
                 if text := tag.get_text():
                     page_text.append(text)
         return "\n\n".join(page_text)
-    
+
     def to_string(self) -> str:
         text = []
         for key in ["id", "headline", "description", "text"]:
