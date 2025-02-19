@@ -1,18 +1,21 @@
 [project]
-name = "letztegensuchen"
+name = "narrative-futures"
 version = "0.1.0"
-description = "Add your description here"
+description = "A python package to scrape article data from several German new sites"
 readme = "README.md"
-authors = [{ name = "Robert Adams", email = "r0b4dams@gmail.com" }]
+authors = [
+    { name = "Robert Adams", email = "r0b4dams@gmail.com" },
+    { name = "Kendra Alexander", email = "konumakendra@gmail.com" },
+]
 requires-python = ">=3.12"
 dependencies = ["beautifulsoup4>=4.13.3", "requests>=2.32.3"]
 
 [project.scripts]
-letztegen = "letztegensuchen:main"
+# nf = "narrative_futures:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["ruff>=0.9.5"]
+dev = ["pytest>=8.3.4", "ruff>=0.9.5"]
