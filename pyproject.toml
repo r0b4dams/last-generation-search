@@ -1,7 +1,7 @@
 [project]
 name = "narrative-futures"
 version = "0.1.0"
-description = "A python package to scrape article data from several German new sites"
+description = "A python package to scrape article data from several German news publications"
 readme = "README.md"
 authors = [
     { name = "Robert Adams", email = "r0b4dams@gmail.com" },
