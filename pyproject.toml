@@ -1,6 +1,6 @@
 [project]
 name = "narrative-futures"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A python package to scrape article data from several German news publications"
 readme = "README.md"
 authors = [
@@ -11,7 +11,10 @@ requires-python = ">=3.12"
 dependencies = ["beautifulsoup4>=4.13.3", "requests>=2.32.3"]
 
 [dependency-groups]
-dev = ["pytest>=8.3.4", "ruff>=0.9.5"]
+dev = [
+ "pytest>=8.3.4",
+ "ruff>=0.9.5",
+]
 
 [project.scripts]
 nf = "narrative_futures.cli:main"
@@ -19,6 +22,13 @@ nf = "narrative_futures.cli:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+only-packages = true
+only-include = ["src/narrative_futures"]
+
+[tool.hatch.version]
+path = "src/narrative_futures/__about__.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
